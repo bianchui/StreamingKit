@@ -11,6 +11,8 @@
 		40B6239422423B1F005D725D /* STKMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 40B6239222423B1E005D725D /* STKMacro.h */; };
 		40B6239822423F28005D725D /* STKSpinLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 40B6239722423F28005D725D /* STKSpinLock.h */; };
 		40B6239922423F28005D725D /* STKSpinLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 40B6239722423F28005D725D /* STKSpinLock.h */; };
+		59ECD02A288FF25900E5DDA4 /* STKCachedDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 59ECD029288FF25900E5DDA4 /* STKCachedDataSource.m */; };
+		59ECD02E288FF55A00E5DDA4 /* STKCachedDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 59ECD02D288FF55A00E5DDA4 /* STKCachedDataSource.h */; };
 		5B949CD21A1140E4005675A0 /* STKAudioPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A1E7C4F1188D5E550010896F /* STKAudioPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5B949CD31A1140E4005675A0 /* STKAutoRecoveringHTTPDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A1E7C4F3188D5E550010896F /* STKAutoRecoveringHTTPDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5B949CD41A1140E4005675A0 /* STKCoreFoundationDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A1E7C4F5188D5E550010896F /* STKCoreFoundationDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -97,6 +99,8 @@
 /* Begin PBXFileReference section */
 		40B6239222423B1E005D725D /* STKMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKMacro.h; sourceTree = "<group>"; };
 		40B6239722423F28005D725D /* STKSpinLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STKSpinLock.h; sourceTree = "<group>"; };
+		59ECD029288FF25900E5DDA4 /* STKCachedDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STKCachedDataSource.m; sourceTree = "<group>"; };
+		59ECD02D288FF55A00E5DDA4 /* STKCachedDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STKCachedDataSource.h; sourceTree = "<group>"; };
 		A1A49969189E744400E2A2E2 /* libStreamingKitMac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libStreamingKitMac.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1A4996A189E744400E2A2E2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		A1A4996D189E744500E2A2E2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -282,6 +286,8 @@
 				A1E7C4F2188D5E550010896F /* STKAudioPlayer.m */,
 				A1E7C4F3188D5E550010896F /* STKAutoRecoveringHTTPDataSource.h */,
 				A1E7C4F4188D5E550010896F /* STKAutoRecoveringHTTPDataSource.m */,
+				59ECD02D288FF55A00E5DDA4 /* STKCachedDataSource.h */,
+				59ECD029288FF25900E5DDA4 /* STKCachedDataSource.m */,
 				A1E7C4F5188D5E550010896F /* STKCoreFoundationDataSource.h */,
 				A1E7C4F6188D5E550010896F /* STKCoreFoundationDataSource.m */,
 				A1E7C4F7188D5E550010896F /* STKDataSource.h */,
@@ -340,6 +346,7 @@
 				5B949CD41A1140E4005675A0 /* STKCoreFoundationDataSource.h in Headers */,
 				40B6239322423B1E005D725D /* STKMacro.h in Headers */,
 				5B949CD51A1140E4005675A0 /* STKDataSource.h in Headers */,
+				59ECD02E288FF55A00E5DDA4 /* STKCachedDataSource.h in Headers */,
 				5B949CD61A1140E4005675A0 /* STKDataSourceWrapper.h in Headers */,
 				5B949CD71A1140E4005675A0 /* STKHTTPDataSource.h in Headers */,
 				5B949CD81A1140E4005675A0 /* STKLocalFileDataSource.h in Headers */,
@@ -445,6 +452,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = A1E7C4BF188D57F50010896F;
@@ -541,6 +549,7 @@
 				A1E7C502188D5E550010896F /* STKDataSource.m in Sources */,
 				A1BF65D5189A65C6004DD08C /* NSMutableArray+STKAudioPlayer.m in Sources */,
 				A1E7C500188D5E550010896F /* STKAutoRecoveringHTTPDataSource.m in Sources */,
+				59ECD02A288FF25900E5DDA4 /* STKCachedDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
