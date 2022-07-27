@@ -203,7 +203,7 @@ static bool addChunk(NSMutableDictionary* meta, uint32_t off, uint32_t size, uin
 }
 
 - (STKDataSource*)innerDataSource {
-    NSLog(@"Cached.innerDataSource");
+    //NSLog(@"Cached.innerDataSource");
     return usingDataSource;
 }
 

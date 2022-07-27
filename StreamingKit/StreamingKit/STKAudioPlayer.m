@@ -414,7 +414,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) setInternalState:(STKAudioPlayerInternalState)value ifInState:(BOOL(^)(STKAudioPlayerInternalState))ifInState
 {
-    NSLog(@"Player.setInternalState");
+    //NSLog(@"Player.setInternalState");
     STKAudioPlayerState newState;
     
     switch (value)
@@ -2976,7 +2976,7 @@ OSStatus AudioConverterCallback(AudioConverterRef inAudioConverter, UInt32* ioNu
 
 static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData)
 {
-    NSLog(@"Player.OutputRenderCallback");
+    //NSLog(@"Player.OutputRenderCallback");
     STKAudioPlayer* audioPlayer = (__bridge STKAudioPlayer*)inRefCon;
 
     setLock(&audioPlayer->currentEntryReferencesLock);
@@ -3350,7 +3350,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) setPeakPowerInDecibelsForChannel:(NSUInteger)channelNumber andPower: (Float32)power
 {
-    NSLog(@"Player.setPeakPowerInDecibelsForChannel");
+    //NSLog(@"Player.setPeakPowerInDecibelsForChannel");
     if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
     {
         return;
@@ -3372,7 +3372,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) setAveragePowerInDecibelsForChannel:(NSUInteger)channelNumber andPower: (Float32)power
 {
-    NSLog(@"Player.setAveragePowerInDecibelsForChannel");
+    //NSLog(@"Player.setAveragePowerInDecibelsForChannel");
     if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
     {
         return;
