@@ -59,10 +59,12 @@
         if (isValid) {
             url = [NSURL URLWithString:fullPath];
             fileSource = [[STKLocalFileDataSource alloc] initWithFilePath:url.path];
-            
+            fileSource.delegate = self;
+
             usingDataSource = fileSource;
         } else {
             httpSource = [[STKAutoRecoveringHTTPDataSource alloc] initWithHTTPDataSource:[[STKHTTPDataSource alloc] initWithURL:url]];
+            httpSource.delegate = self;
 
             usingDataSource = httpSource;
         }
