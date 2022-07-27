@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BUFFER_SIZE 0// 64 * 1024
+
 @interface STKCachedDataSource() {
     AudioFileTypeID audioFileTypeHint;
     STKLocalFileDataSource* fileSource;
@@ -21,22 +23,30 @@
     NSString* fullPath;
     NSString* metaPath;
     NSMutableDictionary* meta;
+#if BUFFER_SIZE
+    char* buffer; // buffer for data flush
+    uint32_t bufOff; // buffer data offset in file
+    uint32_t bufSize; // buffer using size
+#endif//BUFFER_SIZE
 }
+
 @end
 
 @implementation STKCachedDataSource
 
-+ (NSString*) readString:(NSString*)path {
-    FILE* fp = fopen([path UTF8String], "rb");
-    if (fp) {
-        fseek(fp, 0, SEEK_END);
-        uint64_t size = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-        char* buf = (char*)malloc(size);
-        fread(buf, 1, size, fp);
-        fclose(fp);
+static bool writeBinary(const char* path, uint32_t off, const char* data, uint32_t size) {
+    FILE* fp = fopen(path, "rb+");
+    if (!fp && errno == ENOENT) {
+        fp = fopen(path, "wb+");
     }
-    return nil;
+    if (fp) {
+        fseek(fp, off, SEEK_SET);
+        fwrite(data, 1, size, fp);
+        fclose(fp);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 -(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)cachePath {
@@ -48,15 +58,15 @@
         metaPath = [fullPath stringByAppendingPathExtension:@"plist"];
         fullPath = [fullPath stringByAppendingPathExtension:extension];
         meta = [[NSMutableDictionary alloc] initWithContentsOfFile:metaPath];
-        bool isValid = false;
+        bool isDone = false;
         if (!meta) {
             meta = [[NSMutableDictionary alloc] init];
         } else {
             //checkMeta
-            isValid = true;
+            isDone = [[meta objectForKey:@"done"] boolValue];
         }
         
-        if (isValid) {
+        if (isDone) {
             url = [NSURL URLWithString:fullPath];
             fileSource = [[STKLocalFileDataSource alloc] initWithFilePath:url.path];
             fileSource.delegate = self;
@@ -65,11 +75,22 @@
         } else {
             httpSource = [[STKAutoRecoveringHTTPDataSource alloc] initWithHTTPDataSource:[[STKHTTPDataSource alloc] initWithURL:url]];
             httpSource.delegate = self;
-
+#if BUFFER_SIZE
+            buffer = (char*)malloc(BUFFER_SIZE);
+#endif//BUFFER_SIZE
             usingDataSource = httpSource;
         }
     }
     return self;
+}
+
+-(void) dealloc {
+#if BUFFER_SIZE
+    if (buffer) {
+        free(buffer);
+        buffer = 0;
+    }
+#endif//BUFFER_SIZE
 }
 
 + (NSString*)Md5:(const char*)input {
@@ -105,10 +126,11 @@
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size {
     NSLog(@"readIntoBuffer");
     if (usingDataSource) {
-        SInt64 start = usingDataSource.position;
+        SInt64 offset = usingDataSource.position;
         int ret = [usingDataSource readIntoBuffer:buffer withSize:size];
-        if (usingDataSource == httpSource) {
+        if (usingDataSource == httpSource && ret > 0) {
             // cache for http
+            SInt64 len = usingDataSource.length;
             
         }
 
