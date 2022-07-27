@@ -36,6 +36,7 @@
 
 static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eventType, void* inClientInfo)
 {
+    NSLog(@"ReadStreamCallbackProc");
 	STKCoreFoundationDataSource* datasource = (__bridge STKCoreFoundationDataSource*)inClientInfo;
     
     switch (eventType)
@@ -67,21 +68,25 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(BOOL) isInErrorState
 {
+    NSLog(@"Core.isInErrorState");
     return self->isInErrorState;
 }
 
 -(void) dataAvailable
 {
+    NSLog(@"Core.dataAvailable");
     [self.delegate dataSourceDataAvailable:self];
 }
 
 -(void) eof
 {
+    NSLog(@"Core.eof");
     [self.delegate dataSourceEof:self];
 }
 
 -(void) errorOccured
 {
+    NSLog(@"Core.errorOccured");
     self->isInErrorState = YES;
     
     [self.delegate dataSourceErrorOccured:self];
@@ -89,6 +94,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(void) dealloc
 {
+    NSLog(@"Core.dealloc");
     if (stream)
     {
         if (eventsRunLoop)
@@ -104,6 +110,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(void) close
 {
+    NSLog(@"Core.close");
     if (stream)
     {
         if (eventsRunLoop)
@@ -120,19 +127,23 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(void) open
 {
+    NSLog(@"Core.open");
 }
 
 -(void) seekToOffset:(SInt64)offset
 {
+    NSLog(@"Core.seekToOffset(%lld)", offset);
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
+    NSLog(@"Core.readIntoBuffer(%d)", size);
     return (int)CFReadStreamRead(stream, buffer, size);
 }
 
 -(void) unregisterForEvents
 {
+    NSLog(@"Core.unregisterForEvents");
     if (stream)
     {
         CFReadStreamSetClient(stream, kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered, NULL, NULL);
@@ -142,6 +153,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(BOOL) reregisterForEvents
 {
+    NSLog(@"Core.reregisterForEvents");
     if (eventsRunLoop && stream)
     {
         CFStreamClientContext context = {0, (__bridge void*)self, NULL, NULL, NULL};
@@ -156,6 +168,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop
 {
+    NSLog(@"Core.registerForEvents");
     eventsRunLoop = runLoop;
     
 	if (!stream)
@@ -176,6 +189,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(BOOL) hasBytesAvailable
 {
+    NSLog(@"Core.hasBytesAvailable");
     if (!stream)
     {
         return NO;
@@ -186,6 +200,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(CFStreamStatus) status
 {
+    NSLog(@"Core.status");
     if (stream)
     {
         return CFReadStreamGetStatus(stream);
@@ -196,6 +211,7 @@ static void ReadStreamCallbackProc(CFReadStreamRef stream, CFStreamEventType eve
 
 -(void) openCompleted
 {
+    NSLog(@"Core.openCompleted");
 }
 
 @end

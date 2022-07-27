@@ -111,7 +111,7 @@
 
 -(void) dealloc
 {
-    NSLog(@"STKHTTPDataSource dealloc");
+    NSLog(@"HTTP.dealloc");
 }
 
 -(NSURL*) url
@@ -168,6 +168,7 @@
 
 -(AudioFileTypeID) audioFileTypeHint
 {
+    NSLog(@"HTTP.audioFileTypeHint");
     return audioFileTypeHint;
 }
 
@@ -382,6 +383,7 @@
 
 -(void) dataAvailable
 {
+    NSLog(@"HTTP.dataAvailable");
     if (stream == NULL)
     {
         return;
@@ -411,16 +413,19 @@
 
 -(SInt64) position
 {
+    NSLog(@"HTTP.position");
     return seekStart + relativePosition;
 }
 
 -(SInt64) length
 {
+    NSLog(@"HTTP.length");
     return fileLength >= 0 ? fileLength : 0;
 }
 
 -(void) reconnect
 {
+    NSLog(@"HTTP.reconnect");
     NSRunLoop* savedEventsRunLoop = eventsRunLoop;
     
     [self close];
@@ -432,6 +437,7 @@
 
 -(void) seekToOffset:(SInt64)offset
 {
+    NSLog(@"HTTP.readIntoBuffer(%lld)", offset);
     NSRunLoop* savedEventsRunLoop = eventsRunLoop;
     
     [self close];
@@ -456,6 +462,7 @@
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
+    NSLog(@"HTTP.readIntoBuffer(%d)", size);
     return [self privateReadIntoBuffer:buffer withSize:size];
 }
 
@@ -575,11 +582,13 @@
 
 -(void) open
 {
+    NSLog(@"HTTP.open");
     return [self openForSeek:NO];
 }
 
 -(void) openForSeek:(BOOL)forSeek
 {
+    NSLog(@"HTTP.openForSeek");
 	int localRequestSerialNumber;
 	
 	requestSerialNumber++;
@@ -680,21 +689,25 @@
 
 -(UInt32) httpStatusCode
 {
+    NSLog(@"HTTP.httpStatusCode");
     return self->httpStatusCode;
 }
 
 -(NSRunLoop*) eventsRunLoop
 {
+    NSLog(@"HTTP.eventsRunLoop");
     return self->eventsRunLoop;
 }
 
 -(NSString*) description
 {
+    NSLog(@"HTTP.description");
     return [NSString stringWithFormat:@"HTTP data source with file length: %lld and position: %lld", self.length, self.position];
 }
 
 -(BOOL) supportsSeek
 {
+    NSLog(@"HTTP.supportsSeek");
     return self->supportsSeek;
 }
 

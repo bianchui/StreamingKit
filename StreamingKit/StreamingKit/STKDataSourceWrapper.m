@@ -54,85 +54,85 @@
 
 -(AudioFileTypeID) audioFileTypeHint
 {
-    NSLog(@"audioFileTypeHint");
+    NSLog(@"Wrapper.audioFileTypeHint");
     return self.innerDataSource.audioFileTypeHint;
 }
 
 -(void) dealloc
 {
-    NSLog(@"dealloc");
+    NSLog(@"Wrapper.dealloc");
     self.innerDataSource.delegate = nil;
 }
 
 -(SInt64) length
 {
-    NSLog(@"length");
+    NSLog(@"Wrapper.length");
     return self.innerDataSource.length;
 }
 
 -(void) seekToOffset:(SInt64)offset
 {
-    NSLog(@"seekToOffset");
+    NSLog(@"Wrapper.seekToOffset");
     return [self.innerDataSource seekToOffset:offset];
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
-    NSLog(@"readIntoBuffer");
+    NSLog(@"Wrapper.readIntoBuffer");
     return [self.innerDataSource readIntoBuffer:buffer withSize:size];
 }
 
 -(SInt64) position
 {
-    NSLog(@"position");
+    NSLog(@"Wrapper.position");
     return self.innerDataSource.position;
 }
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop
 {
-    NSLog(@"registerForEvents");
+    NSLog(@"Wrapper.registerForEvents");
     return [self.innerDataSource registerForEvents:runLoop];
 }
 
 -(void) unregisterForEvents
 {
-    NSLog(@"unregisterForEvents");
+    NSLog(@"Wrapper.unregisterForEvents");
     [self.innerDataSource unregisterForEvents];
 }
 
 -(void) close
 {
-    NSLog(@"close");
+    NSLog(@"Wrapper.close");
     [self.innerDataSource close];
 }
 
 -(BOOL) hasBytesAvailable
 {
-    NSLog(@"hasBytesAvailable");
+    NSLog(@"Wrapper.hasBytesAvailable");
     return self.innerDataSource.hasBytesAvailable;
 }
 
 -(void) dataSourceDataAvailable:(STKDataSource*)dataSource
 {
-    NSLog(@"dataSourceDataAvailable");
+    NSLog(@"Wrapper.dataSourceDataAvailable");
     [self.delegate dataSourceDataAvailable:self];
 }
 
 -(void) dataSourceErrorOccured:(STKDataSource*)dataSource
 {
-    NSLog(@"dataSourceErrorOccured");
+    NSLog(@"Wrapper.dataSourceErrorOccured");
     [self.delegate dataSourceErrorOccured:self];
 }
 
 -(void) dataSourceEof:(STKDataSource*)dataSource
 {
-    NSLog(@"dataSourceEof");
+    NSLog(@"Wrapper.dataSourceEof");
     [self.delegate dataSourceEof:self];
 }
 
 - (void)dataSource:(STKDataSource *)dataSource didReadStreamMetadata:(NSDictionary *)metadata
 {
-    NSLog(@"dataSource");
+    NSLog(@"Wrapper.dataSource didReadStreamMetadata: %@", metadata);
     [self.delegate dataSource:self didReadStreamMetadata:metadata];
 }
 

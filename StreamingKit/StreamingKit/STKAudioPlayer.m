@@ -414,6 +414,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) setInternalState:(STKAudioPlayerInternalState)value ifInState:(BOOL(^)(STKAudioPlayerInternalState))ifInState
 {
+    NSLog(@"Player.setInternalState");
     STKAudioPlayerState newState;
     
     switch (value)
@@ -496,11 +497,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(STKAudioPlayerStopReason) stopReason
 {
+    NSLog(@"Player.stopReason");
     return stopReason;
 }
 
 -(void) logInfo:(NSString*)line
 {
+    NSLog(@"Player.logInfo");
     if ([NSThread currentThread].isMainThread)
     {
         if ([self.delegate respondsToSelector:@selector(audioPlayer:logInfo:)])
@@ -519,11 +522,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(instancetype) init
 {
+    NSLog(@"Player.init");
     return [self initWithOptions:(STKAudioPlayerOptions){}];
 }
 
 -(instancetype) initWithOptions:(STKAudioPlayerOptions)optionsIn
 {
+    NSLog(@"Player.initWithOptions");
     if (self = [super init])
     {
         pcmBufferSpinLock = OS_UNFAIR_LOCK_INIT;
@@ -649,6 +654,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) startSystemBackgroundTask
 {
+    NSLog(@"Player.startSystemBackgroundTask");
 #if TARGET_OS_IPHONE
 	__block UIBackgroundTaskIdentifier backgroundTaskId = UIBackgroundTaskInvalid;
 	
@@ -671,6 +677,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) stopSystemBackgroundTask
 {
+    NSLog(@"Player.stopSystemBackgroundTask");
 #if TARGET_OS_IPHONE
 	if (stopBackBackgroundTaskBlock != NULL)
 	{
@@ -682,6 +689,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 +(STKDataSource*) dataSourceFromURL:(NSURL*)url
 {
+    NSLog(@"Player.dataSourceFromURL");
     STKDataSource* retval = nil;
     
     if ([url.scheme isEqualToString:@"file"])
@@ -700,11 +708,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 + (AudioStreamBasicDescription)canonicalAudioStreamBasicDescription
 {
+    NSLog(@"Player.canonicalAudioStreamBasicDescription");
   return canonicalAudioStreamBasicDescription;
 }
 
 -(void) clearQueue
 {
+    NSLog(@"Player.clearQueue");
     pthread_mutex_lock(&playerMutex);
     {
         if ([self.delegate respondsToSelector:@selector(audioPlayer:didCancelQueuedItems:)])
@@ -746,11 +756,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) play:(NSString*)urlString
 {
+    NSLog(@"Player.play(%@)", urlString);
 	[self play:urlString withQueueItemID:urlString];
 }
 
 -(void) play:(NSString*)urlString withQueueItemID:(NSObject*)queueItemId
 {
+    NSLog(@"Player.play2(%@)", urlString);
     NSURL* url = [NSURL URLWithString:urlString];
     
 	[self setDataSource:[STKAudioPlayer dataSourceFromURL:url] withQueueItemId:queueItemId];
@@ -758,26 +770,31 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) playURL:(NSURL*)url
 {
+    NSLog(@"Player.playURL(%@)", url);
 	[self playURL:url withQueueItemID:url];
 }
 
 -(void) playURL:(NSURL*)url withQueueItemID:(NSObject*)queueItemId
 {
+    NSLog(@"Player.playURL2(%@)", url);
 	[self setDataSource:[STKAudioPlayer dataSourceFromURL:url] withQueueItemId:queueItemId];
 }
 
 -(void) playDataSource:(STKDataSource*)dataSource
 {
+    NSLog(@"Player.playDataSource");
 	[self playDataSource:dataSource withQueueItemID:dataSource];
 }
 
 -(void) playDataSource:(STKDataSource*)dataSource withQueueItemID:(NSObject *)queueItemId
 {
+    NSLog(@"Player.playDataSource2");
 	[self setDataSource:dataSource withQueueItemId:queueItemId];
 }
 
 -(void) setDataSource:(STKDataSource*)dataSourceIn withQueueItemId:(NSObject*)queueItemId
 {
+    NSLog(@"Player.setDataSource");
     pthread_mutex_lock(&playerMutex);
     {
         LOGINFO(([NSString stringWithFormat:@"Playing: %@", [queueItemId description]]));
@@ -800,26 +817,31 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) queue:(NSString*)urlString
 {
+    NSLog(@"Player.queue(%@)", urlString);
 	return [self queueURL:[NSURL URLWithString:urlString] withQueueItemId:urlString];
 }
 
 -(void) queue:(NSString*)urlString withQueueItemId:(NSObject*)queueItemId
 {
+    NSLog(@"Player.queue2(%@)", urlString);
 	[self queueURL:[NSURL URLWithString:urlString] withQueueItemId:queueItemId];
 }
 
 -(void) queueURL:(NSURL*)url
 {
+    NSLog(@"Player.queueURL(%@)", url);
 	[self queueURL:url withQueueItemId:url];
 }
 
 -(void) queueURL:(NSURL*)url withQueueItemId:(NSObject*)queueItemId
 {
+    NSLog(@"Player.queueURL2(%@)", url);
 	[self queueDataSource:[STKAudioPlayer dataSourceFromURL:url] withQueueItemId:queueItemId];
 }
 
 -(void) queueDataSource:(STKDataSource*)dataSourceIn withQueueItemId:(NSObject*)queueItemId
 {
+    NSLog(@"Player.queueDataSource()");
     pthread_mutex_lock(&playerMutex);
     {
 		if (![self audioGraphIsRunning])
@@ -836,6 +858,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) handlePropertyChangeForFileStream:(AudioFileStreamID)inAudioFileStream fileStreamPropertyID:(AudioFileStreamPropertyID)inPropertyID ioFlags:(UInt32*)ioFlags
 {
+    NSLog(@"Player.handlePropertyChangeForFileStream(%c%c%c%c)", inPropertyID & 0xff, (inPropertyID >> 8) & 0xff, (inPropertyID >> 16) & 0xff, (inPropertyID >> 32) & 0xff);
 	OSStatus error;
     
     if (!currentlyReadingEntry)
@@ -980,6 +1003,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(Float64) currentTimeInFrames
 {
+    NSLog(@"Player.currentTimeInFrames");
     if (audioGraph == nil)
     {
         return 0;
@@ -990,6 +1014,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) unexpectedError:(STKAudioPlayerErrorCode)errorCodeIn
 {
+    NSLog(@"Player.unexpectedError");
     self.internalState = STKAudioPlayerInternalStateError;
     
     [self playbackThreadQueueMainThreadSyncBlock:^
@@ -1000,6 +1025,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(double) duration
 {
+    NSLog(@"Player.duration");
     if (self.internalState == STKAudioPlayerInternalStatePendingNext)
     {
         return 0;
@@ -1027,6 +1053,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(double) progress
 {
+    NSLog(@"Player.progress");
     if (seekToTimeWasRequested)
     {
         return requestedSeekTime;
@@ -1055,6 +1082,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(float) rate
 {
+    NSLog(@"Player.rate");
 	AudioUnitParameterValue rateValue;
 	AudioUnitGetParameter(playbackRateUnit, kNewTimePitchParam_Rate, kAudioUnitScope_Global, 0, &rateValue);
 	return rateValue;
@@ -1062,11 +1090,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) setRate:(float)rate
 {
+    NSLog(@"Player.setRate");
 	AudioUnitSetParameter(playbackRateUnit, kNewTimePitchParam_Rate, kAudioUnitScope_Global, 0, rate, 0);
 }
 
 -(float) overlap
 {
+    NSLog(@"Player.overlap");
 	AudioUnitParameterValue overlapValue;
 	AudioUnitGetParameter(playbackRateUnit, kNewTimePitchParam_Overlap, kAudioUnitScope_Global, 0, &overlapValue);
 	return overlapValue;
@@ -1074,11 +1104,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) setOverlap:(float)overlap
 {
+    NSLog(@"Player.setOverlap");
 	AudioUnitSetParameter(playbackRateUnit, kNewTimePitchParam_Overlap, kAudioUnitScope_Global, 0, overlap, 0);
 }
 
 -(BOOL) invokeOnPlaybackThread:(void(^)(void))block
 {
+    NSLog(@"Player.invokeOnPlaybackThread");
 	NSRunLoop* runLoop = playbackThreadRunLoop;
 	
     if (runLoop)
@@ -1094,6 +1126,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) wakeupPlaybackThread
 {
+    NSLog(@"Player.wakeupPlaybackThread");
 	[self invokeOnPlaybackThread:^
 	{
 		[self processRunloop];
@@ -1111,6 +1144,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) seekToTime:(double)value
 {
+    NSLog(@"Player.seekToTime");
     if (currentlyPlayingEntry == nil)
     {
         return;
@@ -1139,6 +1173,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) createPlaybackThread
 {
+    NSLog(@"Player.createPlaybackThread");
     playbackThread = [[NSThread alloc] initWithTarget:self selector:@selector(startInternal) object:nil];
     
     [playbackThread start];
@@ -1151,6 +1186,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) audioQueueFinishedPlaying:(STKQueueEntry*)entry
 {
+    NSLog(@"Player.audioQueueFinishedPlaying");
     STKQueueEntry* next = [bufferingQueue dequeue];
     
     [self processFinishPlayingIfAnyAndPlayingNext:entry withNext:next];
@@ -1159,11 +1195,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) setCurrentlyReadingEntry:(STKQueueEntry*)entry andStartPlaying:(BOOL)startPlaying
 {
+    NSLog(@"Player.setCurrentlyReadingEntry");
     [self setCurrentlyReadingEntry:entry andStartPlaying:startPlaying clearQueue:YES];
 }
 
 -(void) setCurrentlyReadingEntry:(STKQueueEntry*)entry andStartPlaying:(BOOL)startPlaying clearQueue:(BOOL)clearQueue
 {
+    NSLog(@"Player.setCurrentlyReadingEntry3");
     LOGINFO(([entry description]));
 
     if (startPlaying)
@@ -1214,6 +1252,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) processFinishPlayingIfAnyAndPlayingNext:(STKQueueEntry*)entry withNext:(STKQueueEntry*)next
 {
+    NSLog(@"Player.processFinishPlayingIfAnyAndPlayingNext");
     if (entry != currentlyPlayingEntry)
     {
         return;
@@ -1283,6 +1322,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) dispatchSyncOnMainThread:(void(^)(void))block
 {
+    NSLog(@"Player.dispatchSyncOnMainThread");
 	__block BOOL finished = NO;
 
 	if (disposeWasRequested)
@@ -1325,6 +1365,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) playbackThreadQueueMainThreadSyncBlock:(void(^)(void))block
 {
+    NSLog(@"Player.playbackThreadQueueMainThreadSyncBlock");
     block = [block copy];
     
     [self invokeOnPlaybackThread:^
@@ -1340,6 +1381,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) requeueBufferingEntries
 {
+    NSLog(@"Player.requeueBufferingEntries");
     if (bufferingQueue.count > 0)
     {
         for (STKQueueEntry* queueEntry in bufferingQueue)
@@ -1357,6 +1399,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(BOOL) processRunloop
 {
+    NSLog(@"Player.processRunloop");
     pthread_mutex_lock(&playerMutex);
     {
         if (disposeWasRequested)
@@ -1458,6 +1501,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) startInternal
 {
+    NSLog(@"Player.startInternal");
 	@autoreleasepool
 	{
 		playbackThreadRunLoop = [NSRunLoop currentRunLoop];
@@ -1513,6 +1557,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) processSeekToTime
 {
+    NSLog(@"Player.processSeekToTime");
 	OSStatus error;
     STKQueueEntry* currentEntry = currentlyReadingEntry;
     
@@ -1581,6 +1626,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) dataSourceDataAvailable:(STKDataSource*)dataSourceIn
 {
+    NSLog(@"Player.dataSourceDataAvailable");
 	OSStatus error;
     
     if (currentlyReadingEntry.dataSource != dataSourceIn)
@@ -1659,6 +1705,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) dataSourceErrorOccured:(STKDataSource*)dataSourceIn
 {
+    NSLog(@"Player.dataSourceErrorOccured");
     if (currentlyReadingEntry.dataSource != dataSourceIn)
     {
         return;
@@ -1669,6 +1716,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) dataSourceEof:(STKDataSource*)dataSourceIn
 {
+    NSLog(@"Player.dataSourceEof");
     if (currentlyReadingEntry == nil || currentlyReadingEntry.dataSource != dataSourceIn)
     {
         dataSourceIn.delegate = nil;
@@ -1722,12 +1770,14 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void)dataSource:(STKDataSource *)dataSource didReadStreamMetadata:(NSDictionary *)metadata
 {
+    NSLog(@"Player.dataSource: didReadStreamMetadata:");
     if([self.delegate respondsToSelector:@selector(audioPlayer:didReadStreamMetadata:)])
         [self.delegate audioPlayer:self didReadStreamMetadata:metadata];
 }
 
 -(void) pause
 {
+    NSLog(@"Player.pause");
     pthread_mutex_lock(&playerMutex);
     {
 		OSStatus error;
@@ -1759,6 +1809,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) resume
 {
+    NSLog(@"Player.resume");
     pthread_mutex_lock(&playerMutex);
     {
 		OSStatus error;
@@ -1794,6 +1845,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) resetPcmBuffers
 {
+    NSLog(@"Player.resetPcmBuffers");
     setLock(&pcmBufferSpinLock);
     
     self->pcmBufferFrameStartIndex = 0;
@@ -1808,6 +1860,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) stop
 {
+    NSLog(@"Player.stop");
     pthread_mutex_lock(&playerMutex);
     {
         if (self.internalState == STKAudioPlayerInternalStateStopped)
@@ -1854,6 +1907,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) stopThread
 {
+    NSLog(@"Player.stopThread");
     BOOL wait = NO;
     
     NSRunLoop* runLoop = playbackThreadRunLoop;
@@ -1895,11 +1949,13 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(BOOL) muted
 {
+    NSLog(@"Player.muted");
 	return self->muted;
 }
 
 -(void) setMuted:(BOOL)value
 {
+    NSLog(@"Player.setMuted");
 	self->muted = value;
 }
 
@@ -1915,6 +1971,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) closeRecordAudioFile
 {
+    NSLog(@"Player.closeRecordAudioFile");
     if (recordAudioFileId)
     {
         AudioFileClose(recordAudioFileId);
@@ -2002,6 +2059,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) destroyAudioConverter
 {
+    NSLog(@"Player.destroyAudioConverter");
     if (audioConverterRef)
     {
         AudioConverterDispose(audioConverterRef);
@@ -2012,6 +2070,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) createAudioConverter:(AudioStreamBasicDescription*)asbd
 {
+    NSLog(@"Player.createAudioConverter");
     OSStatus status;
     Boolean writable;
     UInt32 cookieSize = 0;
@@ -2188,6 +2247,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) createPlaybackRateUnit
 {
+    NSLog(@"Player.createPlaybackRateUnit");
     OSStatus status;
     
     CHECK_STATUS_AND_RETURN(AUGraphAddNode(audioGraph, &playbackRateUnitDescription, &playbackRateNode));
@@ -2204,6 +2264,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) createOutputUnit
 {
+    NSLog(@"Player.createOutputUnit");
 	OSStatus status;
 	
 	CHECK_STATUS_AND_RETURN(AUGraphAddNode(audioGraph, &outputUnitDescription, &outputNode));
@@ -2224,6 +2285,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) createMixerUnit
 {
+    NSLog(@"Player.createMixerUnit");
 	OSStatus status;
 	
 	if (!self.options.enableVolumeMixer)
@@ -2247,6 +2309,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) createEqUnit
 {
+    NSLog(@"Player.createEqUnit");
 #if TARGET_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_9
     return;
 #else
@@ -2282,6 +2345,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) setGain:(float)gain forEqualizerBand:(int)bandIndex
 {
+    NSLog(@"Player.setGain");
 	if (!eqUnit)
 	{
 		return;
@@ -2294,6 +2358,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(AUNode) createConverterNode:(AudioStreamBasicDescription)srcFormat desFormat:(AudioStreamBasicDescription)desFormat
 {
+    NSLog(@"Player.createConverterNode");
 	OSStatus status;
 	AUNode convertNode;
 	AudioComponentInstance convertUnit;
@@ -2311,6 +2376,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) connectNodes:(AUNode)srcNode desNode:(AUNode)desNode srcUnit:(AudioComponentInstance)srcUnit desUnit:(AudioComponentInstance)desUnit
 {
+    NSLog(@"Player.connectNodes");
     OSStatus status;
     BOOL addConverter = NO;
     AudioStreamBasicDescription srcFormat, desFormat;
@@ -2343,6 +2409,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) setOutputCallbackForFirstNode:(AUNode)firstNode firstUnit:(AudioComponentInstance)firstUnit
 {
+    NSLog(@"Player.setOutputCallbackForFirstNode");
 	OSStatus status;
 	AURenderCallbackStruct callbackStruct;
 	
@@ -2372,6 +2439,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) createAudioGraph
 {
+    NSLog(@"Player.createAudioGraph");
     OSStatus status;
     converterNodes = [[NSMutableArray alloc] init];
     
@@ -2392,6 +2460,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) connectGraph
 {
+    NSLog(@"Player.connectGraph");
     OSStatus status;
     NSMutableArray* nodes = [[NSMutableArray alloc] init];
     NSMutableArray* units = [[NSMutableArray alloc] init];
@@ -2457,6 +2526,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(BOOL) audioGraphIsRunning
 {
+    NSLog(@"Player.audioGraphIsRunning");
 	OSStatus status;
 	Boolean isRunning;
     
@@ -2472,6 +2542,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(BOOL) startAudioGraph
 {
+    NSLog(@"Player.startAudioGraph");
     OSStatus status;
     
 	[self resetPcmBuffers];
@@ -2497,6 +2568,7 @@ static BOOL GetHardwareCodecClassDesc(UInt32 formatId, AudioClassDescription* cl
 
 -(void) stopAudioUnitWithReason:(STKAudioPlayerStopReason)stopReasonIn
 {
+    NSLog(@"Player.stopAudioUnitWithReason");
 	OSStatus status;
 	
 	if (!audioGraph)
@@ -2547,6 +2619,7 @@ AudioConvertInfo;
 
 OSStatus AudioConverterCallback(AudioConverterRef inAudioConverter, UInt32* ioNumberDataPackets, AudioBufferList* ioData, AudioStreamPacketDescription **outDataPacketDescription, void* inUserData)
 {
+    NSLog(@"Player.AudioConverterCallback");
     AudioConvertInfo* convertInfo = (AudioConvertInfo*)inUserData;
     
     if (convertInfo->done)
@@ -2572,6 +2645,7 @@ OSStatus AudioConverterCallback(AudioConverterRef inAudioConverter, UInt32* ioNu
 
 -(void) handleAudioPackets:(const void*)inputData numberBytes:(UInt32)numberBytes numberPackets:(UInt32)numberPackets packetDescriptions:(AudioStreamPacketDescription*)packetDescriptionsIn
 {
+    NSLog(@"Player.handleAudioPackets");
     if (currentlyReadingEntry == nil)
     {
         return;
@@ -2839,6 +2913,7 @@ OSStatus AudioConverterCallback(AudioConverterRef inAudioConverter, UInt32* ioNu
 
 - (void)handleRecordingOfAudioPackets:(UInt32)numberOfPackets audioBuffer:(AudioBuffer *)audioBuffer
 {
+    NSLog(@"Player.handleRecordingOfAudioPackets");
     if (recordAudioFileId && recordAudioConverterRef)
     {
         AudioConvertInfo recordConvertInfo;
@@ -2899,6 +2974,7 @@ OSStatus AudioConverterCallback(AudioConverterRef inAudioConverter, UInt32* ioNu
 
 static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData)
 {
+    NSLog(@"Player.OutputRenderCallback");
     STKAudioPlayer* audioPlayer = (__bridge STKAudioPlayer*)inRefCon;
 
     setLock(&audioPlayer->currentEntryReferencesLock);
@@ -3196,6 +3272,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(NSArray*) pendingQueue
 {
+    NSLog(@"Player.pendingQueue");
 	pthread_mutex_lock(&playerMutex);
 	
 	NSArray* retval;
@@ -3220,6 +3297,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(NSUInteger) pendingQueueCount
 {
+    NSLog(@"Player.pendingQueueCount");
 	pthread_mutex_lock(&playerMutex);
 	
 	NSUInteger retval = upcomingQueue.count + bufferingQueue.count;
@@ -3231,6 +3309,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(NSObject*) mostRecentlyQueuedStillPendingItem
 {
+    NSLog(@"Player.mostRecentlyQueuedStillPendingItem");
 	pthread_mutex_lock(&playerMutex);
 	
 	if (upcomingQueue.count > 0)
@@ -3258,6 +3337,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(float) peakPowerInDecibelsForChannel:(NSUInteger)channelNumber
 {
+    NSLog(@"Player.peakPowerInDecibelsForChannel");
 	if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
 	{
 		return 0;
@@ -3268,6 +3348,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) setPeakPowerInDecibelsForChannel:(NSUInteger)channelNumber andPower: (Float32)power
 {
+    NSLog(@"Player.setPeakPowerInDecibelsForChannel");
     if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
     {
         return;
@@ -3278,6 +3359,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(float) averagePowerInDecibelsForChannel:(NSUInteger)channelNumber
 {
+    NSLog(@"Player.averagePowerInDecibelsForChannel");
 	if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
 	{
 		return 0;
@@ -3288,6 +3370,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) setAveragePowerInDecibelsForChannel:(NSUInteger)channelNumber andPower: (Float32)power
 {
+    NSLog(@"Player.setAveragePowerInDecibelsForChannel");
     if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
     {
         return;
@@ -3298,6 +3381,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(BOOL) meteringEnabled
 {
+    NSLog(@"Player.meteringEnabled");
 	return self->meteringEnabled;
 }
 
@@ -3321,6 +3405,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) setMeteringEnabled:(BOOL)value
 {
+    NSLog(@"Player.setMeteringEnabled");
 	if (self->meteringEnabled == value)
 	{
 		return;
@@ -3397,16 +3482,19 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(NSArray*) frameFilters
 {
+    NSLog(@"Player.frameFilters");
 	return frameFilters;
 }
 
 -(void) appendFrameFilterWithName:(NSString*)name block:(STKFrameFilter)block
 {
+    NSLog(@"Player.appendFrameFilterWithName");
 	[self addFrameFilterWithName:name afterFilterWithName:nil block:block];
 }
 
 -(void) removeFrameFilterWithName:(NSString*)name
 {
+    NSLog(@"Player.removeFrameFilterWithName");
 	pthread_mutex_lock(&self->playerMutex);
 	
 	NSMutableArray* newFrameFilters = [[NSMutableArray alloc] initWithCapacity:frameFilters.count + 1];
@@ -3437,6 +3525,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) addFrameFilterWithName:(NSString*)name afterFilterWithName:(NSString*)afterFilterWithName block:(STKFrameFilter)block
 {
+    NSLog(@"Player.addFrameFilterWithName");
 	pthread_mutex_lock(&self->playerMutex);
 	
 	NSMutableArray* newFrameFilters = [[NSMutableArray alloc] initWithCapacity:frameFilters.count + 1];
@@ -3470,6 +3559,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) addFrameFilter:(STKFrameFilter)frameFilter withName:(NSString*)name afterFilterWithName:(NSString*)afterFilterWithName
 {
+    NSLog(@"Player.addFrameFilter");
 	pthread_mutex_lock(&self->playerMutex);
 	
 	NSMutableArray* newFrameFilters = [[NSMutableArray alloc] initWithCapacity:frameFilters.count + 1];
@@ -3505,6 +3595,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(void) setVolume:(Float32)value;
 {
+    NSLog(@"Player.setVolume");
 	self->volume = value;
 	
 #if (TARGET_OS_IPHONE)
@@ -3526,16 +3617,19 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(Float32) volume
 {
+    NSLog(@"Player.volume");
 	return self->volume;
 }
 
 -(BOOL) equalizerEnabled
 {
+    NSLog(@"Player.equalizerEnabled");
     return self->equalizerEnabled;
 }
 
 -(void) setEqualizerEnabled:(BOOL)value
 {
+    NSLog(@"Player.setEqualizerEnabled");
     self->equalizerEnabled = value;
 }
 

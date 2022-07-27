@@ -149,6 +149,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop
 {
+    NSLog(@"ARHTTP.registerForEvents()");
     [super registerForEvents:runLoop];
     [self startNotifierOnRunLoop:runLoop];
     
@@ -167,6 +168,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(void) unregisterForEvents
 {
+    NSLog(@"ARHTTP.unregisterForEvents()");
     [super unregisterForEvents];
     [self stopNotifier];
     
@@ -243,6 +245,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(void) seekToOffset:(int64_t)offset
 {
+    NSLog(@"ARHTTP.seekToOffset(%lld)", offset);
 	ticksWhenLastDataReceived = GetTickCount();
 	
 	[super seekToOffset:offset];
@@ -250,6 +253,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(void) close
 {
+    NSLog(@"ARHTTP.close");
     [self destroyTimeoutTimer];
     [super close];
 }
@@ -287,6 +291,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(void) dataSourceDataAvailable:(STKDataSource*)dataSource
 {
+    NSLog(@"ARHTTP.dataSourceDataAvailable");
     if (![self.innerDataSource hasBytesAvailable])
     {
         return;
@@ -352,7 +357,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(void) dataSourceEof:(STKDataSource*)dataSource
 {
-	NSLog(@"dataSourceEof");
+	NSLog(@"ARHTTP.dataSourceEof");
 	
     if ([self position] < [self length])
     {
@@ -366,7 +371,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(void) dataSourceErrorOccured:(STKDataSource*)dataSource
 {
-    NSLog(@"dataSourceErrorOccured");
+    NSLog(@"ARHTTP.dataSourceErrorOccured");
     
     if (self.innerDataSource.httpStatusCode == 416 /* Range out of bounds */)
     {
@@ -380,6 +385,7 @@ static void PopulateOptionsWithDefault(STKAutoRecoveringHTTPDataSourceOptions* o
 
 -(NSString*) description
 {
+    NSLog(@"ARHTTP.description");
     return [NSString stringWithFormat:@"HTTP data source with file length: %lld and position: %lld", self.length, self.position];
 }
 

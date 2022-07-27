@@ -93,16 +93,19 @@
 
 -(AudioFileTypeID) audioFileTypeHint
 {
+    NSLog(@"File.audioFileTypeHint");
     return audioFileTypeHint;
 }
 
 -(void) dealloc
 {
+    NSLog(@"File.dealloc");
     [self close];
 }
 
 -(void) close
 {
+    NSLog(@"File.close");
     if (stream)
     {
         [self unregisterForEvents];
@@ -115,6 +118,7 @@
 
 -(void) open
 {
+    NSLog(@"File.open");
     if (stream)
     {
         [self unregisterForEvents];
@@ -155,16 +159,19 @@
 
 -(SInt64) position
 {
+    NSLog(@"File.position");
     return position;
 }
 
 -(SInt64) length
 {
+    NSLog(@"File.length");
     return length;
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
+    NSLog(@"File.readIntoBuffer(%d)", size);
     int retval = (int)CFReadStreamRead(stream, buffer, size);
 
     if (retval > 0)
@@ -183,6 +190,7 @@
 
 -(void) seekToOffset:(SInt64)offset
 {
+    NSLog(@"File.seekToOffset(%lld)", offset);
     CFStreamStatus status = kCFStreamStatusClosed;
     
     if (stream != 0)
@@ -237,6 +245,7 @@
 
 -(NSString*) description
 {
+    NSLog(@"File.description");
     return self->filePath;
 }
 
