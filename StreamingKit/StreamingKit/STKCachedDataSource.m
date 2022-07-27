@@ -85,6 +85,7 @@ static bool writeBinary(const char* path, uint32_t off, const char* data, uint32
 }
 
 -(void) dealloc {
+    NSLog(@"Cached.dealloc");
 #if BUFFER_SIZE
     if (buffer) {
         free(buffer);
@@ -104,7 +105,7 @@ static bool writeBinary(const char* path, uint32_t off, const char* data, uint32
 }
 
 -(AudioFileTypeID) audioFileTypeHint {
-    NSLog(@"audioFileTypeHint");
+    NSLog(@"Cached.audioFileTypeHint");
     return audioFileTypeHint;
 }
 
