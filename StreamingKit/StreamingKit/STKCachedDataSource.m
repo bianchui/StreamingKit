@@ -88,22 +88,22 @@
 }
 
 - (STKDataSource*)innerDataSource {
-    NSLog(@"innerDataSource");
+    NSLog(@"Cached.innerDataSource");
     return usingDataSource;
 }
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop {
-    NSLog(@"registerForEvents");
+    NSLog(@"Cached.registerForEvents");
     return [super registerForEvents:runLoop];
 }
 
 -(void) unregisterForEvents {
-    NSLog(@"unregisterForEvents");
+    NSLog(@"Cached.unregisterForEvents");
     [super unregisterForEvents];
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size {
-    NSLog(@"readIntoBuffer");
+    NSLog(@"Cached.readIntoBuffer");
     if (usingDataSource) {
         SInt64 start = usingDataSource.position;
         int ret = [usingDataSource readIntoBuffer:buffer withSize:size];
