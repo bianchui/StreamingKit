@@ -202,22 +202,22 @@ static bool addChunk(NSMutableDictionary* meta, uint32_t off, uint32_t size, uin
 }
 
 - (STKDataSource*)innerDataSource {
-    NSLog(@"innerDataSource");
+    //NSLog(@"innerDataSource");
     return usingDataSource;
 }
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop {
-    NSLog(@"registerForEvents");
+    //NSLog(@"registerForEvents");
     return [super registerForEvents:runLoop];
 }
 
 -(void) unregisterForEvents {
-    NSLog(@"unregisterForEvents");
+    //NSLog(@"unregisterForEvents");
     [super unregisterForEvents];
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size {
-    NSLog(@"readIntoBuffer");
+    //NSLog(@"readIntoBuffer");
     if (usingDataSource) {
         SInt64 offset = usingDataSource.position;
         int ret = [usingDataSource readIntoBuffer:buffer withSize:size];
