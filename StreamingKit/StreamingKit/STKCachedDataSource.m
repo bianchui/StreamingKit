@@ -10,22 +10,62 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "STKAutoRecoveringHTTPDataSource.h"
 #import "STKLocalFileDataSource.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 @interface STKCachedDataSource() {
     AudioFileTypeID audioFileTypeHint;
     STKLocalFileDataSource* fileSource;
     STKAutoRecoveringHTTPDataSource* httpSource;
     STKDataSource* usingDataSource;
+    NSString* fullPath;
+    NSString* metaPath;
+    NSMutableDictionary* meta;
 }
 @end
 
 @implementation STKCachedDataSource
 
--(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)path {
++ (NSString*) readString:(NSString*)path {
+    FILE* fp = fopen([path UTF8String], "rb");
+    if (fp) {
+        fseek(fp, 0, SEEK_END);
+        uint64_t size = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+        char* buf = (char*)malloc(size);
+        fread(buf, 1, size, fp);
+        fclose(fp);
+    }
+    return nil;
+}
+
+-(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)cachePath {
     if (self = [super init]) {
         NSString* md5 = [STKCachedDataSource Md5:[[url absoluteString] UTF8String]];
         NSString* extension = [[url path] pathExtension];
         audioFileTypeHint = [STKLocalFileDataSource audioFileTypeHintFromFileExtension:extension];
+        fullPath = [cachePath stringByAppendingPathComponent:md5];
+        metaPath = [fullPath stringByAppendingPathExtension:@"plist"];
+        fullPath = [fullPath stringByAppendingPathExtension:extension];
+        meta = [[NSMutableDictionary alloc] initWithContentsOfFile:metaPath];
+        bool isValid = false;
+        if (!meta) {
+            meta = [[NSMutableDictionary alloc] init];
+        } else {
+            //checkMeta
+            isValid = true;
+        }
+        
+        if (isValid) {
+            url = [NSURL URLWithString:fullPath];
+            fileSource = [[STKLocalFileDataSource alloc] initWithFilePath:url.path];
+            
+            usingDataSource = fileSource;
+        } else {
+            httpSource = [[STKAutoRecoveringHTTPDataSource alloc] initWithHTTPDataSource:[[STKHTTPDataSource alloc] initWithURL:url]];
+
+            usingDataSource = httpSource;
+        }
     }
     return self;
 }
@@ -40,101 +80,24 @@
     return output;
 }
 
-//@property (readonly) BOOL supportsSeek;
-//@property (readonly) SInt64 position;
-//@property (readonly) SInt64 length;
-//@property (readonly) BOOL hasBytesAvailable;
-//@property (nonatomic, readwrite, assign) double durationHint;
-//@property (readwrite, unsafe_unretained, nullable) id<STKDataSourceDelegate> delegate;
-//@property (nonatomic, strong, nullable) NSURL *recordToFileUrl;
-
 -(AudioFileTypeID) audioFileTypeHint {
+    NSLog(@"audioFileTypeHint");
     return audioFileTypeHint;
 }
 
--(void) dealloc {
-    if (usingDataSource) {
-        usingDataSource.delegate = nil;
-    }
-    fileSource = nil;
-    usingDataSource = nil;
-    httpSource = nil;
-}
-
--(SInt64) length {
-    return self.usingDataSource.length;
-}
-
--(void) seekToOffset:(SInt64)offset {
-    return [self.usingDataSource seekToOffset:offset];
-}
-
--(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size {
-    return [self.usingDataSource readIntoBuffer:buffer withSize:size];
-}
-
--(SInt64) position {
-    return self.usingDataSource.position;
-}
-
--(BOOL) registerForEvents:(NSRunLoop*)runLoop
-{
-    return [self.innerDataSource registerForEvents:runLoop];
-}
-
--(void) unregisterForEvents {
-    [self.innerDataSource unregisterForEvents];
-}
-
--(void) close {
-    [self.innerDataSource close];
-}
-
--(BOOL) hasBytesAvailable {
-    return self.innerDataSource.hasBytesAvailable;
-}
-
--(void) dataSourceDataAvailable:(STKDataSource*)dataSource {
-    [self.delegate dataSourceDataAvailable:self];
-}
-
--(void) dataSourceErrorOccured:(STKDataSource*)dataSource {
-    [self.delegate dataSourceErrorOccured:self];
-}
-
--(void) dataSourceEof:(STKDataSource*)dataSource {
-    [self.delegate dataSourceEof:self];
-}
-
-- (void)dataSource:(STKDataSource *)dataSource didReadStreamMetadata:(NSDictionary *)metadata
-{
-    [self.delegate dataSource:self didReadStreamMetadata:metadata];
+- (STKDataSource*)innerDataSource {
+    NSLog(@"innerDataSource");
+    return usingDataSource;
 }
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop {
     NSLog(@"registerForEvents");
-    return NO;
+    return [super registerForEvents:runLoop];
 }
 
 -(void) unregisterForEvents {
     NSLog(@"unregisterForEvents");
-}
-
--(void) close {
-    NSLog(@"close");
-    if (usingDataSource) {
-        [usingDataSource close];
-        fileSource = nil;
-        usingDataSource = nil;
-        httpSource = nil;
-    }
-}
-
--(void) seekToOffset:(SInt64)offset {
-    NSLog(@"seekToOffset");
-    if (usingDataSource) {
-        [usingDataSource seekToOffset:offset];
-    }
+    [super unregisterForEvents];
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size {
