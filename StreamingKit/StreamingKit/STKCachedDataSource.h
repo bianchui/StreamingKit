@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "STKDataSourceWrapper.h"
 
-@interface STKCachedDataSource : STKDataSource
+@interface STKCachedDataSource : STKDataSourceWrapper
 
--(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)path;
+-(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)cachePath;
 
 @end
