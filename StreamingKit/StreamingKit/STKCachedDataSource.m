@@ -55,6 +55,91 @@ static bool writeBinary(const char* path, uint32_t off, const void* data, uint32
 }
 
 static bool addChunk(NSMutableDictionary* meta, uint32_t off, uint32_t size, uint32_t total) {
+    if ([[meta objectForKey:kKeyDone] boolValue]) {
+        return true;
+    }
+    id chunks = [meta objectForKey:kKeyChunks];
+    if (chunks && ![chunks isKindOfClass:[NSMutableArray class]]) {
+        if ([chunks isKindOfClass:[NSArray class]]) {
+            chunks = [chunks mutableCopy];
+        } else {
+            chunks = nil;
+        }
+    }
+    if (!chunks) {
+        chunks = [NSMutableArray arrayWithCapacity:10];
+    }
+    uint32_t startChunk = off;
+    uint32_t endChunk = off + size;
+    NSUInteger count = [chunks count];
+    bool find = false;
+    // (start, end), (start, end)
+    for (NSUInteger i = 0; i < count; i += 2) {
+        uint32_t end = [[chunks objectAtIndex:i + 1] intValue];
+        if (end < startChunk) {
+            // end, GAP, startChunk
+            continue;
+        }
+        find = true;
+        uint32_t start = [[chunks objectAtIndex:i] intValue];
+        if (endChunk < start) {
+            // endChunk, GAP, start: insert at i
+            [chunks insertObject:[NSNumber numberWithInt:startChunk] atIndex:i];
+            [chunks insertObject:[NSNumber numberWithInt:endChunk] atIndex:i + 1];
+            break;
+        }
+
+        // merge with current chunk
+        if (start <= startChunk) {
+            // start, startChunk => start
+            startChunk = start;
+        } else {
+            // startChunk, start => startChunk
+            [chunks setObject:[NSNumber numberWithInt:startChunk] atIndex:i];
+        }
+        if (endChunk <= end) {
+            // endChunk, end => end
+            endChunk = end;
+        } else {
+            // end, endChunk => endChunk
+            // extends end of current chunk, try merge follow chunks
+            NSUInteger j = i + 2;
+            while (j < count) {
+                start = [[chunks objectAtIndex:j] intValue];
+                if (endChunk < start) {
+                    // endChunk, GAP, start
+                    break;
+                }
+                end = [[chunks objectAtIndex:j + 1] intValue];
+                // erase anyway
+                [chunks removeObjectAtIndex:j];
+                [chunks removeObjectAtIndex:j];
+                if (endChunk <= end) {
+                    // endChunk, end => end
+                    endChunk = end;
+                    break;
+                }
+                // end, endChunk => endChunk
+                count -= 2;
+            }
+            [chunks setObject:[NSNumber numberWithInt:endChunk] atIndex:i + 1];
+        }
+        break;
+    }
+    
+    const bool done = startChunk == 0 && endChunk == total;
+    
+    if (!find) {
+        [chunks addObject:[NSNumber numberWithInt:startChunk]];
+        [chunks addObject:[NSNumber numberWithInt:endChunk]];
+    }
+    
+    if (done) {
+        [meta setObject:[NSNumber numberWithBool:true] forKey:kKeyDone];
+    }
+    
+    [meta setObject:chunks forKey:kKeyChunks];
+    return true;
 }
 
 -(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)cachePath {
