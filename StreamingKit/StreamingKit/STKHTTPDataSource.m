@@ -168,7 +168,7 @@
 
 -(AudioFileTypeID) audioFileTypeHint
 {
-    NSLog(@"HTTP.audioFileTypeHint");
+    NSLog(@"HTTP.audioFileTypeHint => %c%c%c%c", (audioFileTypeHint >> 24) & 0xff, (audioFileTypeHint >> 16) & 0xff, (audioFileTypeHint >> 8) & 0xff, audioFileTypeHint & 0xff);
     return audioFileTypeHint;
 }
 
@@ -413,13 +413,13 @@
 
 -(SInt64) position
 {
-    NSLog(@"HTTP.position");
+    NSLog(@"HTTP.position => %lld", seekStart + relativePosition);
     return seekStart + relativePosition;
 }
 
 -(SInt64) length
 {
-    NSLog(@"HTTP.length");
+    //NSLog(@"HTTP.length(%lld)", fileLength);
     return fileLength >= 0 ? fileLength : 0;
 }
 
@@ -437,7 +437,7 @@
 
 -(void) seekToOffset:(SInt64)offset
 {
-    NSLog(@"HTTP.readIntoBuffer(%lld)", offset);
+    NSLog(@"HTTP.seekToOffset(%lld)", offset);
     NSRunLoop* savedEventsRunLoop = eventsRunLoop;
     
     [self close];
@@ -462,7 +462,8 @@
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
-    NSLog(@"HTTP.readIntoBuffer(%d)", size);
+    SInt64 pos = seekStart + relativePosition;
+    NSLog(@"HTTP.readIntoBuffer(%d) = [%lld, %lld]", size, pos, pos + size);
     return [self privateReadIntoBuffer:buffer withSize:size];
 }
 
@@ -588,7 +589,7 @@
 
 -(void) openForSeek:(BOOL)forSeek
 {
-    NSLog(@"HTTP.openForSeek");
+    NSLog(@"HTTP.openForSeek(%d)", forSeek);
 	int localRequestSerialNumber;
 	
 	requestSerialNumber++;
@@ -689,7 +690,7 @@
 
 -(UInt32) httpStatusCode
 {
-    NSLog(@"HTTP.httpStatusCode");
+    NSLog(@"HTTP.httpStatusCode => %d", self->httpStatusCode);
     return self->httpStatusCode;
 }
 
@@ -707,7 +708,7 @@
 
 -(BOOL) supportsSeek
 {
-    NSLog(@"HTTP.supportsSeek");
+    NSLog(@"HTTP.supportsSeek => %d", self->supportsSeek);
     return self->supportsSeek;
 }
 

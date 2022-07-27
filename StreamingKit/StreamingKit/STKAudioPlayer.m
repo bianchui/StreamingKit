@@ -858,7 +858,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(void) handlePropertyChangeForFileStream:(AudioFileStreamID)inAudioFileStream fileStreamPropertyID:(AudioFileStreamPropertyID)inPropertyID ioFlags:(UInt32*)ioFlags
 {
-    NSLog(@"Player.handlePropertyChangeForFileStream(%c%c%c%c)", inPropertyID & 0xff, (inPropertyID >> 8) & 0xff, (inPropertyID >> 16) & 0xff, (inPropertyID >> 32) & 0xff);
+    NSLog(@"Player.handlePropertyChangeForFileStream(%c%c%c%c)", (inPropertyID >> 24) & 0xff, (inPropertyID >> 16) & 0xff, (inPropertyID >> 8) & 0xff, inPropertyID & 0xff);
 	OSStatus error;
     
     if (!currentlyReadingEntry)
@@ -1025,7 +1025,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(double) duration
 {
-    NSLog(@"Player.duration");
+    //NSLog(@"Player.duration");
     if (self.internalState == STKAudioPlayerInternalStatePendingNext)
     {
         return 0;
@@ -1053,7 +1053,7 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
 
 -(double) progress
 {
-    NSLog(@"Player.progress");
+    //NSLog(@"Player.progress");
     if (seekToTimeWasRequested)
     {
         return requestedSeekTime;
@@ -3359,7 +3359,7 @@ static OSStatus OutputRenderCallback(void* inRefCon, AudioUnitRenderActionFlags*
 
 -(float) averagePowerInDecibelsForChannel:(NSUInteger)channelNumber
 {
-    NSLog(@"Player.averagePowerInDecibelsForChannel");
+    //NSLog(@"Player.averagePowerInDecibelsForChannel");
 	if (channelNumber >= canonicalAudioStreamBasicDescription.mChannelsPerFrame)
 	{
 		return 0;

@@ -159,7 +159,7 @@
 
 -(SInt64) position
 {
-    NSLog(@"File.position");
+    NSLog(@"File.position => %lld", position);
     return position;
 }
 

@@ -66,25 +66,25 @@
 
 -(SInt64) length
 {
-    NSLog(@"Wrapper.length");
+    //NSLog(@"Wrapper.length");
     return self.innerDataSource.length;
 }
 
 -(void) seekToOffset:(SInt64)offset
 {
-    NSLog(@"Wrapper.seekToOffset");
+    NSLog(@"Wrapper.seekToOffset(%lld)", offset);
     return [self.innerDataSource seekToOffset:offset];
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
-    NSLog(@"Wrapper.readIntoBuffer");
+    NSLog(@"Wrapper.readIntoBuffer(%d)", size);
     return [self.innerDataSource readIntoBuffer:buffer withSize:size];
 }
 
 -(SInt64) position
 {
-    NSLog(@"Wrapper.position");
+    //NSLog(@"Wrapper.position");
     return self.innerDataSource.position;
 }
 
