@@ -333,6 +333,7 @@
         self->supportsSeek = ![[httpHeaders objectForKey:@"Accept-Ranges"] isEqualToString:@"none"];
     }
     
+    NSLog(@"HTTP.parseHttpHeader(%d)", self->httpStatusCode);
     if (self.httpStatusCode == 200)
     {
         if (seekStart == 0)
@@ -340,6 +341,7 @@
             id value = [httpHeaders objectForKey:@"Content-Length"] ?: [httpHeaders objectForKey:@"content-length"];
             
             fileLength = (SInt64)[value longLongValue];
+            NSLog(@"HTTP.parseHttpHeader.fileLength(%lld)", fileLength);
         }
         
         NSString* contentType = [httpHeaders objectForKey:@"Content-Type"] ?: [httpHeaders objectForKey:@"content-type"] ;
@@ -358,6 +360,7 @@
         if (components.count == 2)
         {
             fileLength = [[components objectAtIndex:1] integerValue];
+            NSLog(@"HTTP.parseHttpHeader.fileLength(%lld)", fileLength);
         }
     }
     else if (self.httpStatusCode == 416)
