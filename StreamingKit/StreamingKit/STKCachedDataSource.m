@@ -13,7 +13,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 0// 64 * 1024
+#define BUFFER_SIZE 0// (256 * 1024)
+#define MAX_CACHE (64 * 1024 * 1024)
+
+static const NSString* kKeyDone = @"done";
+static const NSString* kKeyLength = @"length";
+static const NSString* kKeyChunks = @"chunks";
 
 @interface STKCachedDataSource() {
     AudioFileTypeID audioFileTypeHint;
@@ -34,7 +39,7 @@
 
 @implementation STKCachedDataSource
 
-static bool writeBinary(const char* path, uint32_t off, const char* data, uint32_t size) {
+static bool writeBinary(const char* path, uint32_t off, const void* data, uint32_t size) {
     FILE* fp = fopen(path, "rb+");
     if (!fp && errno == ENOENT) {
         fp = fopen(path, "wb+");
@@ -49,6 +54,9 @@ static bool writeBinary(const char* path, uint32_t off, const char* data, uint32
     }
 }
 
+static bool addChunk(NSMutableDictionary* meta, uint32_t off, uint32_t size, uint32_t total) {
+}
+
 -(instancetype) initWithUrl:(NSURL*)url cachePath:(NSString*)cachePath {
     if (self = [super init]) {
         NSString* md5 = [STKCachedDataSource Md5:[[url absoluteString] UTF8String]];
@@ -57,13 +65,13 @@ static bool writeBinary(const char* path, uint32_t off, const char* data, uint32
         fullPath = [cachePath stringByAppendingPathComponent:md5];
         metaPath = [fullPath stringByAppendingPathExtension:@"plist"];
         fullPath = [fullPath stringByAppendingPathExtension:extension];
-        meta = [[NSMutableDictionary alloc] initWithContentsOfFile:metaPath];
+        meta = [NSMutableDictionary dictionaryWithContentsOfFile:metaPath];
         bool isDone = false;
         if (!meta) {
             meta = [[NSMutableDictionary alloc] init];
         } else {
             //checkMeta
-            isDone = [[meta objectForKey:@"done"] boolValue];
+            isDone = [[meta objectForKey:kKeyDone] boolValue];
         }
         
         if (isDone) {
@@ -131,7 +139,19 @@ static bool writeBinary(const char* path, uint32_t off, const char* data, uint32
         if (usingDataSource == httpSource && ret > 0) {
             // cache for http
             SInt64 len = usingDataSource.length;
-            
+            if (len > 0 && len < MAX_CACHE) {
+                int oldLen = [[meta objectForKey:kKeyLength] intValue];
+                if (oldLen == 0) {
+                    oldLen = (int)len;
+                    [meta setObject:[NSNumber numberWithInt:oldLen] forKey:kKeyLength];
+                }
+                if (oldLen == (int)len) {
+                    if (writeBinary(fullPath.UTF8String, (uint32_t)offset, buffer, ret)) {
+                        addChunk(meta, (uint32_t)offset, ret, oldLen);
+                        [meta writeToFile:metaPath atomically:YES];
+                    }
+                }
+            }
         }
 
         return ret;
