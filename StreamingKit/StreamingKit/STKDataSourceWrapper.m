@@ -54,71 +54,85 @@
 
 -(AudioFileTypeID) audioFileTypeHint
 {
+    NSLog(@"audioFileTypeHint");
     return self.innerDataSource.audioFileTypeHint;
 }
 
 -(void) dealloc
 {
+    NSLog(@"dealloc");
     self.innerDataSource.delegate = nil;
 }
 
 -(SInt64) length
 {
+    NSLog(@"length");
     return self.innerDataSource.length;
 }
 
 -(void) seekToOffset:(SInt64)offset
 {
+    NSLog(@"seekToOffset");
     return [self.innerDataSource seekToOffset:offset];
 }
 
 -(int) readIntoBuffer:(UInt8*)buffer withSize:(int)size
 {
+    NSLog(@"readIntoBuffer");
     return [self.innerDataSource readIntoBuffer:buffer withSize:size];
 }
 
 -(SInt64) position
 {
+    NSLog(@"position");
     return self.innerDataSource.position;
 }
 
 -(BOOL) registerForEvents:(NSRunLoop*)runLoop
 {
+    NSLog(@"registerForEvents");
     return [self.innerDataSource registerForEvents:runLoop];
 }
 
 -(void) unregisterForEvents
 {
+    NSLog(@"unregisterForEvents");
     [self.innerDataSource unregisterForEvents];
 }
 
 -(void) close
 {
+    NSLog(@"close");
     [self.innerDataSource close];
 }
 
 -(BOOL) hasBytesAvailable
 {
+    NSLog(@"hasBytesAvailable");
     return self.innerDataSource.hasBytesAvailable;
 }
 
 -(void) dataSourceDataAvailable:(STKDataSource*)dataSource
 {
+    NSLog(@"dataSourceDataAvailable");
     [self.delegate dataSourceDataAvailable:self];
 }
 
 -(void) dataSourceErrorOccured:(STKDataSource*)dataSource
 {
+    NSLog(@"dataSourceErrorOccured");
     [self.delegate dataSourceErrorOccured:self];
 }
 
 -(void) dataSourceEof:(STKDataSource*)dataSource
 {
+    NSLog(@"dataSourceEof");
     [self.delegate dataSourceEof:self];
 }
 
 - (void)dataSource:(STKDataSource *)dataSource didReadStreamMetadata:(NSDictionary *)metadata
 {
+    NSLog(@"dataSource");
     [self.delegate dataSource:self didReadStreamMetadata:metadata];
 }
 
