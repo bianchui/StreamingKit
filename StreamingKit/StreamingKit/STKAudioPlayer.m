@@ -41,6 +41,7 @@
 #import "NSMutableArray+STKAudioPlayer.h"
 #import "libkern/OSAtomic.h"
 #import <float.h>
+#import "STKCachedDataSource.h"
 
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623157e+308
@@ -689,6 +690,8 @@ static void AudioFileStreamPacketsProc(void* clientData, UInt32 numberBytes, UIn
     }
     else if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame)
     {
+        NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        STKDataSource* ds = [[STKCachedDataSource alloc] initWithUrl:url cachePath:docPath];
         retval = [[STKAutoRecoveringHTTPDataSource alloc] initWithHTTPDataSource:[[STKHTTPDataSource alloc] initWithURL:url]];
     }
     
